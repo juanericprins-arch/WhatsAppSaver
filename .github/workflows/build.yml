@@ -13,11 +13,21 @@ jobs:
           cache: gradle
       - name: Build
         run: |
-          unzip WhatsApp_AutoSaver_Ready_To_Build.zip
+          # 1. Find and unzip the project
+          ZIP_FILE=$(find . -name "*.zip" | head -n 1)
+          unzip -o "$ZIP_FILE"
+          
+          # 2. Find the folder that contains 'gradlew'
+          GRADLEW_PATH=$(find . -name "gradlew" | head -n 1)
+          PROJECT_ROOT=$(dirname "$GRADLEW_PATH")
+          
+          # 3. Move to that folder and build
+          cd "$PROJECT_ROOT"
           chmod +x gradlew
           ./gradlew assembleDebug
+          
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: WhatsAppSaver-APK
-          path: app/build/outputs/apk/debug/app-debug.apk
+          path: "**/app/build/outputs/apk/debug/app-debug.apk"
